@@ -1,5 +1,5 @@
 import 'package:bmi_calculator/constants.dart';
-import 'package:bmi_calculator/input_page.dart';
+import 'package:bmi_calculator/result_page.dart';
 import 'package:bmi_calculator/reusable_card.dart';
 import 'package:flutter/material.dart';
 import 'package:bmi_calculator/icon_content.dart';
@@ -15,6 +15,8 @@ class InputPage extends StatefulWidget {
 class _InputPageState extends State<InputPage> {
   Gender? selectedGender;
   int height = 180;
+  int weight = 60;
+  int age = 25;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +53,7 @@ class _InputPageState extends State<InputPage> {
                   colour: selectedGender == Gender.female
                       ? kActiveCardColor
                       : kInactiveCardColour,
-                  cardChild: ValueInCard(
+                  cardChild: const ValueInCard(
                     icon: FontAwesomeIcons.venus,
                     title: "ЖЕНЩИНА",
                   ),
@@ -64,7 +66,7 @@ class _InputPageState extends State<InputPage> {
             cardChild: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                const Text(
                   "РОСТ",
                   style: kLabelTextStyle,
                 ),
@@ -77,34 +79,25 @@ class _InputPageState extends State<InputPage> {
                       height.toString(),
                       style: kNumberTextStyle,
                     ),
-                    Text(
+                    const Text(
                       "см",
                       style: kLabelTextStyle,
                     ),
                   ],
                 ),
                 SliderTheme(
+                  // переопределяем тему слайдера. Основная тема задана в main
                   data: SliderTheme.of(context).copyWith(
-                    thumbShape:
-                        const RoundSliderThumbShape(enabledThumbRadius: 15.0),
-                    overlayShape:
-                        const RoundSliderOverlayShape(overlayRadius: 30.0),
-                    thumbColor: const Color(0xFFEB1555),
-                    activeTrackColor: Colors.white,
-                    overlayColor: const Color(0x29EB1555),
+                    inactiveTrackColor: const Color(0xFF8D8E98),
                   ),
                   child: Slider(
                     value: height.toDouble(),
                     min: kMinHeight,
                     max: kMaxHeight,
-                    //activeColor: const Color(0xFFEB1555),
-                    inactiveColor: const Color(0xFF8D8E98),
                     onChanged: (double newValue) {
                       setState(() {
                         height = newValue.round();
                       });
-
-                      print(height);
                     },
                   ),
                 ),
@@ -115,49 +108,81 @@ class _InputPageState extends State<InputPage> {
             child: Row(
               children: [
                 ReusableCard(
-                  onPress: () {
-                    setState(() {
-                      selectedGender = Gender.female;
-                    });
-                  },
                   colour: kActiveCardColor,
                   cardChild: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        FontAwesomeIcons.mars,
-                        size: 80.0,
+                      const Text(
+                        "ВЕС",
+                        style: kLabelTextStyle,
                       ),
                       Text(
-                        "MALE",
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          color: Color(0xFF8D8E98),
-                        ),
+                        weight.toString(),
+                        style: kNumberTextStyle,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          RoundIconButton(
+                            icon: FontAwesomeIcons.minus,
+                            onPressed: () {
+                              setState(() {
+                                weight--;
+                              });
+                            },
+                          ),
+                          const SizedBox(
+                            width: 10.0,
+                          ),
+                          RoundIconButton(
+                            icon: FontAwesomeIcons.plus,
+                            onPressed: () {
+                              setState(() {
+                                weight++;
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
                 ReusableCard(
-                  onPress: () {
-                    setState(() {
-                      selectedGender = Gender.female;
-                    });
-                  },
                   colour: kActiveCardColor,
                   cardChild: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        FontAwesomeIcons.mars,
-                        size: 80.0,
+                      const Text(
+                        "ВОЗРАСТ",
+                        style: kLabelTextStyle,
                       ),
                       Text(
-                        "MALE",
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          color: Color(0xFF8D8E98),
-                        ),
+                        age.toString(),
+                        style: kNumberTextStyle,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          RoundIconButton(
+                            icon: FontAwesomeIcons.minus,
+                            onPressed: () {
+                              setState(() {
+                                age--;
+                              });
+                            },
+                          ),
+                          const SizedBox(
+                            width: 10.0,
+                          ),
+                          RoundIconButton(
+                            icon: FontAwesomeIcons.plus,
+                            onPressed: () {
+                              setState(() {
+                                age++;
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -165,14 +190,48 @@ class _InputPageState extends State<InputPage> {
               ],
             ),
           ),
-          Container(
-            color: kBottomContainerColor,
-            margin: const EdgeInsets.only(top: 10.0),
-            width: double.infinity,
-            height: kBottomContainerHeight,
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return ResultsPage();
+                }),
+              );
+            },
+            child: Container(
+              child: Text("Рассчитать"),
+              color: kBottomContainerColor,
+              margin: const EdgeInsets.only(top: 10.0),
+              width: double.infinity,
+              height: kBottomContainerHeight,
+            ),
           )
         ],
       ),
+    );
+  }
+}
+
+class RoundIconButton extends StatelessWidget {
+  final IconData icon;
+  final Function() onPressed;
+
+  const RoundIconButton(
+      {super.key, required this.icon, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return RawMaterialButton(
+      elevation: 6.0,
+      onPressed: onPressed,
+      constraints: const BoxConstraints.tightFor(
+        width: 56.0,
+        height: 56.0,
+      ),
+      shape: const CircleBorder(),
+      fillColor: const Color(0xFF4C4F5E),
+      child: Icon(icon),
     );
   }
 }
